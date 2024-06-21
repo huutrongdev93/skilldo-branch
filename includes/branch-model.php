@@ -16,7 +16,7 @@ Class Branch extends \SkillDo\Model\Model {
         ]
     ];
 
-    static function delete($branchID = 0): array|false
+    static function delete($branchID = 0): array|bool
     {
         $branchID = (int)Str::clear($branchID);
 

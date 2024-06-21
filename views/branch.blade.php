@@ -231,7 +231,7 @@
 
 	        request.post(ajax , data).then(function(response) {
 
-                SkilldoHelper.message.response(response);
+                SkilldoMessage.response(response);
 
                 if(response.status === 'success') {
 
@@ -273,7 +273,7 @@
 
             request.post(ajax , data).then(function( response ) {
 
-                SkilldoHelper.message.response(response);
+                SkilldoMessage.response(response);
 
                 if(response.status === 'success') {
 
@@ -295,7 +295,7 @@
             data.action     = 'AdminBranchAjax::save';
 
             request.post(ajax , data).then(function(response) {
-                SkilldoHelper.message.response(response);
+                SkilldoMessage.response(response);
             });
 
             return false;
