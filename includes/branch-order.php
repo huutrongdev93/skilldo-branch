@@ -9,11 +9,6 @@ Class BrandOrderAction {
         add_filter('admin_order_index_args', array($this, 'searchData'), 9);
     }
 
-    public function insert($data, $order) {
-        if (!empty($order['branch_id'])) $data['branch_id'] = (int)$order['branch_id'];
-        return $data;
-    }
-
     public function checkout($order, $metadata_order) {
 
         $branches = Branch::gets(Qr::set('status', 'working'));
@@ -57,7 +52,11 @@ Class BrandOrderAction {
             foreach ($branches as $branch) {
                 $branch_options[$branch->id] = $branch->name;
             }
-            $Form->add('branch_id','select', ['after' => '<div class="form-group">', 'before' => '</div>', 'placeholder' => 'Chi nhánh', 'options' => $branch_options], Request::get('branch_id'));
+            $Form->select('branch_id', $branch_options, [
+                'start' => '<div class="form-group">',
+                'end' => '</div>',
+                'placeholder' => 'Chi nhánh'
+            ], request()->input('branch_id'));
         }
 
         return $Form;
@@ -65,7 +64,7 @@ Class BrandOrderAction {
 
     public function searchData($args): Qr
     {
-        $branch_id = Str::clear(Request::post('branch_id'));
+        $branch_id = Str::clear(request()->input('branch_id'));
         if(!empty($branch_id)) {
             $args->where('branch_id', $branch_id);
         }

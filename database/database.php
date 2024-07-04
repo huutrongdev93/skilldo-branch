@@ -20,7 +20,7 @@ return new class () extends Migration {
                 $table->integer('default')->default(0);
                 $table->integer('order')->default(0);
                 $table->text('area')->collate('utf8mb4_unicode_ci')->nullable();
-                $table->dateTime('created');
+                $table->dateTime('created')->default('CURRENT_TIMESTAMP');
                 $table->dateTime('updated')->nullable();
             });
         }

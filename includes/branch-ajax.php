@@ -52,14 +52,14 @@ class AdminBranchAjax {
         if($request->isMethod('post')) {
 
             if(!Auth::hasCap('branch_edit')) {
-                response()->error(trans('dmin.branch.ajax.error.permission'));
+                response()->error(trans('branch.ajax.error.permission'));
             }
 
             $validate = $request->validate([
                 'branch.id' => Rule::make('id chi nhánh')->notEmpty(),
                 'branch.name' => Rule::make(trans('branch.field.name'))->notEmpty(),
-                'branch.address' => Rule::make(trans('address'))->notEmpty(),
-                'branch.phone' => Rule::make(trans('phone'))->notEmpty(),
+                'branch.address' => Rule::make(trans('general.address'))->notEmpty(),
+                'branch.phone' => Rule::make(trans('general.phone'))->notEmpty(),
             ]);
 
             if ($validate->fails()) {
@@ -189,14 +189,12 @@ class AdminBranchAjax {
             if(have_posts($branch)) {
 
                 if($branch->status ==  'working') {
-
                     response()->error(trans('branch.ajax.error.start'));
                 }
 
                 $result = Branch::where('id', $branch->id)->update(['status' => 'working']);
 
                 if($result) {
-
                     response()->success(trans('ajax.update.success'));
                 }
             }

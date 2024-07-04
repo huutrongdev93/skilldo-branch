@@ -5,19 +5,20 @@ Class Branch_Activator {
         $db = include BRANCH_PATH.'/database/database.php';
         $db->up();
         self::addRole();
+        CacheHandler::delete('table_columns_order');
     }
 
     public static function addRole(): void
     {
         $root = Role::get('root');
-        $root->add_cap('branch_list');
-        $root->add_cap('branch_add');
-        $root->add_cap('branch_edit');
+        $root->add('branch_list');
+        $root->add('branch_add');
+        $root->add('branch_edit');
 
         $admin = Role::get('administrator');
-        $admin->add_cap('branch_list');
-        $admin->add_cap('branch_add');
-        $admin->add_cap('branch_edit');
+        $admin->add('branch_list');
+        $admin->add('branch_add');
+        $admin->add('branch_edit');
     }
 }
 

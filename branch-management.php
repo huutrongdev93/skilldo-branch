@@ -9,6 +9,8 @@ Version         : 1.2.0
  */
 const BRANCH_NAME = 'branch-management';
 
+const BRANCH_VERSION = '1.2.0';
+
 define('BRANCH_PATH', Path::plugin(BRANCH_NAME));
 
 class Branch_Management {
@@ -31,6 +33,8 @@ require_once 'includes/branch-active.php';
 require_once 'includes/branch-model.php';
 
 if(Admin::is()) {
+
+    include_once 'update.php';
 
     include_once 'includes/branch-roles.php';
 
