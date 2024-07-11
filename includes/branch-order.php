@@ -3,8 +3,6 @@ Class BrandOrderAction {
 
     public function __construct() {
         add_filter('checkout_order_before_save', array($this, 'checkout'), 10, 2);
-        add_filter('pre_insert_order_data', array($this, 'insert'), 10, 2);
-
         add_filter('admin_order_index_search', array($this, 'searchField'), 9);
         add_filter('admin_order_index_args', array($this, 'searchData'), 9);
     }

@@ -28,6 +28,6 @@ Class BranchUpdateVersion {
     }
     public function version_1_2_0(): void
     {
-        (include BRANCH_PATH.'database/db_1.2.0.php')->up();
+        (include BRANCH_PATH.'/database/db_1.2.0.php')->up();
     }
 }
