@@ -1,0 +1,8 @@
+{
+    "name": "Kho hàng chi nhánh",
+    "class": "Branch_Management",
+    "url": "https://sikido.vn",
+    "description": "Ứng dụng quản lý chi nhánh",
+    "author": "SKDSoftware Dev Team",
+    "version": "1.2.0"
+}

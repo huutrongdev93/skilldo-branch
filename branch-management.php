@@ -1,12 +1,4 @@
 <?php
-/**
-Plugin name     : Branch management
-Plugin class    : Branch_Management
-Plugin uri      : http://sikido.vn
-Description     : Ứng dụng quản lý chi nhánh
-Author          : Nguyễn Hữu Trọng
-Version         : 1.2.0
- */
 const BRANCH_NAME = 'branch-management';
 
 const BRANCH_VERSION = '1.2.0';
