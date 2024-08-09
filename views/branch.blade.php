@@ -50,9 +50,8 @@
                     @if(Auth::hasCap('branch_edit'))
                         @if($branch->status == 'working')
                             {!!
-                                 Admin::btnConfirm([
-                                     'btn'          => 'red',
-                                     'label'        => trans('branch.button.stop'),
+                                 Admin::btnConfirm('red', [
+                                     'text'         => trans('branch.button.stop'),
                                      'ajax'         => 'AdminBranchAjax::stop',
                                      'heading'      => trans('branch.button.stop'),
                                      'description'  => trans('branch.button.stop.confirm'),
@@ -65,9 +64,8 @@
                             <button type="button" class="btn btn-blue js_stock_branch__save">{{trans('branch.button.save')}}</button>
                         @else
                             {!!
-                                 Admin::btnConfirm([
-                                     'btn'          => 'green',
-                                     'label'        => trans('branch.button.start'),
+                                 Admin::btnConfirm('green', [
+                                     'text'         => trans('branch.button.start'),
                                      'ajax'         => 'AdminBranchAjax::start',
                                      'heading'      => trans('branch.button.start'),
                                      'description'  => trans('branch.button.start.confirm'),
