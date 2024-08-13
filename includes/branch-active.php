@@ -5,7 +5,7 @@ Class Branch_Activator {
         $db = include BRANCH_PATH.'/database/database.php';
         $db->up();
         self::addRole();
-        CacheHandler::delete('table_columns_order');
+        \SkillDo\Cache::delete('table_columns_order');
     }
 
     public static function addRole(): void

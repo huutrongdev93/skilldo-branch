@@ -14,9 +14,9 @@ return new class () extends Migration {
                 $table->string('phone', 200)->collate('utf8mb4_unicode_ci')->nullable();
                 $table->string('email', 200)->collate('utf8mb4_unicode_ci')->nullable();
                 $table->string('address', 255)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('ward', 100)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('district', 100)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('city', 100)->collate('utf8mb4_unicode_ci')->nullable();
+                $table->integer('ward')->default(0);
+                $table->integer('district')->default(0);
+                $table->integer('city')->default(0);
                 $table->string('status', 100)->collate('utf8mb4_unicode_ci')->default('working');
                 $table->integer('default')->default(0);
                 $table->integer('order')->default(0);

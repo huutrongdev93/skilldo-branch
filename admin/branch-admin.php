@@ -16,7 +16,7 @@ class AdminBranch {
     {
         $branches = Branch::gets();
 
-        $provinces = Cart_Location::cities();
+        $provinces = Skilldo\Location::provincesOptions();
 
         foreach ($branches as $key => $branch) {
             $form = form();

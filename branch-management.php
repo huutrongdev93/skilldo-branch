@@ -1,7 +1,7 @@
 <?php
 const BRANCH_NAME = 'branch-management';
 
-const BRANCH_VERSION = '1.2.0';
+const BRANCH_VERSION = '1.2.1';
 
 define('BRANCH_PATH', Path::plugin(BRANCH_NAME));
 
