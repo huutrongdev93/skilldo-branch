@@ -4,7 +4,6 @@ use SkillDo\Validate\Rule;
 use SkillDo\Http\Request;
 
 class AdminBranchAjax {
-    #[NoReturn]
     static function add(Request $request, $model): void
     {
         if($request->isMethod('post')) {
@@ -45,7 +44,6 @@ class AdminBranchAjax {
         response()->error(trans('ajax.add.error'));
     }
 
-    #[NoReturn]
     static function save(Request $request, $model): void
     {
 
@@ -89,9 +87,9 @@ class AdminBranchAjax {
                 response()->error($error);
             }
 
-            if(isset($branch['default']) && $branch['default'] == 1) {
+            if(isset($branch['isDefault']) && $branch['isDefault'] == 1) {
 
-                Branch::where('id', '<>', $error)->update(['default' => 0]);
+                Branch::where('id', '<>', $error)->update(['isDefault' => 0]);
             }
 
             response()->success(trans('ajax.save.success'));
@@ -100,114 +98,87 @@ class AdminBranchAjax {
         response()->error(trans('ajax.save.error'));
     }
 
-    #[NoReturn]
-    static function areaSave(Request $request, $model): void
+    static function status(\SkillDo\Http\Request $request): void
     {
+        $validate = $request->validate([
+            'id' => Rule::make('Id chi nhánh')->notEmpty()->integer()->min(1),
+            'status' => Rule::make('Trạng thái')->notEmpty()->in(array_column(\Branch\Status::cases(), 'value')),
+        ]);
 
-        if($request->isMethod('post')) {
-
-            if(!Auth::hasCap('branch_edit')) {
-                response()->error(trans('branch.ajax.error.permission'));
-            }
-
-            $pick_sale_area = $request->input('pick_sale_area');
-
-            $id      = (int)$request->input('id');
-
-            $branch = branch::get($id);
-
-            if(!have_posts($branch)) {
-                response()->error(trans('branch.ajax.error.notFound'));
-            }
-
-            if(is_array($pick_sale_area)) {
-
-                if(have_posts($pick_sale_area)) {
-                    foreach ($pick_sale_area as $key => $area) {
-                        $pick_sale_area[$key] = trim(Str::clear($area));
-                    }
-                }
-
-                $branch->area = $pick_sale_area;
-
-                Branch::insert(['id' => $id, 'area' => $pick_sale_area], $branch);
-
-                response()->success(trans('ajax.save.success'), $pick_sale_area);
-            }
+        if ($validate->fails()) {
+            response()->error($validate->errors());
         }
 
-        response()->error(trans('ajax.save.error'));
+        $id = (int)$request->input('id');
+
+        $object = Branch::widthStop()->whereKey($id)->first();
+
+        if(!have_posts($object)) {
+            response()->error('Chi nhánh không tồn tại');
+        }
+
+        $status = Str::clear($request->input('status'));
+
+        if($status == $object->status)
+        {
+            response()->error('Trạng thái Chi nhánh không thay đổi');
+        }
+
+        if($status == \Branch\Status::stop->value && $object->isDefault == 1)
+        {
+            response()->error('Không thể ngừng sử dụng chi nhánh mặc định');
+        }
+
+        $object->status = $status;
+
+        $object->save();
+
+        response()->success(trans('ajax.update.success'), \SkillDo\Table\Columns\ColumnBadge::make('status', [], [])
+            ->value($object->status)
+            ->color(fn (string $state): string => \Branch\Status::tryFrom($state)->badge())
+            ->label(fn (string $state): string => \Branch\Status::tryFrom($state)->label())
+            ->attributes(fn ($item): array => [
+                'data-id' => $object->id,
+                'data-status' => $object->status,
+            ])
+            ->class(['js_branch_btn_status'])->view());
     }
 
-    #[NoReturn]
-    static function stop(Request $request, $model): void
+    static function default(\SkillDo\Http\Request $request): void
     {
+        $validate = $request->validate([
+            'id' => Rule::make('Id chi nhánh')->notEmpty()->integer()->min(1),
+        ]);
 
-        if($request->isMethod('post')) {
-
-            if(!Auth::hasCap('branch_edit')) {
-                response()->error(trans('branch.ajax.error.permission'));
-            }
-
-            $branch_id = $request->input('id');
-
-            $branch = Branch::get($branch_id);
-
-            if(have_posts($branch)) {
-
-                if($branch->default ==  1) {
-
-                    response()->error(trans('branch.ajax.error.stopDefault'));
-                }
-
-                $result = Branch::where('id', $branch->id)->update(['status' => 'stop']);
-
-                if($result) {
-
-                    response()->success(trans('ajax.update.success'));
-                }
-            }
+        if ($validate->fails()) {
+            response()->error($validate->errors());
         }
 
-        response()->error(trans('ajax.update.error'));
-    }
+        $id = (int)$request->input('id');
 
-    #[NoReturn]
-    static function start(Request $request, $model): void
-    {
+        $object = Branch::widthStop()->whereKey($id)->first();
 
-        if($request->isMethod('post')) {
-
-            if(!Auth::hasCap('branch_edit')) {
-                response()->error(trans('branch.ajax.error.permission'));
-            }
-
-            $branch_id = $request->input('id');
-
-            $branch = Branch::get($branch_id);
-
-            if(have_posts($branch)) {
-
-                if($branch->status ==  'working') {
-                    response()->error(trans('branch.ajax.error.start'));
-                }
-
-                $result = Branch::where('id', $branch->id)->update(['status' => 'working']);
-
-                if($result) {
-                    response()->success(trans('ajax.update.success'));
-                }
-            }
+        if(!have_posts($object)) {
+            response()->error('Chi nhánh không tồn tại');
         }
 
-        response()->error(trans('ajax.update.error'));
+        if($object->isDefault == 1) {
+            response()->error('Chi nhánh này đang là chi nhánh mặc định');
+        }
+
+        Branch::widthStop()->where('isDefault', 1)->update(['isDefault' => 0]);
+
+        $object->isDefault = 1;
+
+        $object->save();
+
+        response()->success(trans('ajax.update.success'));
     }
 }
 
 Ajax::admin('AdminBranchAjax::add');
 Ajax::admin('AdminBranchAjax::save');
-Ajax::admin('AdminBranchAjax::areaSave');
-Ajax::admin('AdminBranchAjax::stop');
-Ajax::admin('AdminBranchAjax::start');
+Ajax::admin('AdminBranchAjax::status');
+Ajax::admin('AdminBranchAjax::default');
 
 

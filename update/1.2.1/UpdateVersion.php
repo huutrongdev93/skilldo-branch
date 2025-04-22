@@ -1,42 +1,20 @@
 <?php
-if(!Admin::is()) return;
+namespace Branch\Update;
 
-function BranchUpdateCore(): void
+use Cart_Location_Old;
+
+class UpdateVersion121
 {
-    if(Admin::is() && Auth::check()) {
-        $version = Option::get('branch_version');
-        $version = (empty($version)) ? '1.1.1' : $version;
-        if (version_compare(BRANCH_VERSION, $version) === 1) {
-            $update = new BranchUpdateVersion();
-            $update->runUpdate($version);
-        }
+    public function database(): void
+    {
+        (include BRANCH_PATH.'/database/db_1.2.1.php')->up();
     }
-}
-add_action('admin_init', 'BranchUpdateCore');
 
-Class BranchUpdateVersion {
-    public function runUpdate($DiscountVersion): void
+    public function location(): void
     {
-        $listVersion    = ['1.2.0', '1.2.1'];
-        foreach ($listVersion as $version) {
-            if(version_compare($version, $DiscountVersion) == 1) {
-                $function = 'version_'.str_replace('.','_',$version);
-                if(method_exists($this, $function)) $this->$function();
-            }
-        }
-        Option::update('branch_version', BRANCH_VERSION);
-    }
-    public function version_1_2_0(): void
-    {
-        (include BRANCH_PATH.'/database/db_1.2.0.php')->up();
-    }
-    public function version_1_2_1(): void
-    {
-        $branches = Branch::gets();
+        $branches = \Branch::all();
 
         if(have_posts($branches)) {
-
-            $model = model();
 
             $provinces = Cart_Location_Old::cities();
 
@@ -136,16 +114,20 @@ Class BranchUpdateVersion {
                 }
 
                 if(count($updates) >= 500) {
-                    $model->table('branchs')::updateBatch($updates, 'id');
+                    \Branch::updateBatch($updates, 'id');
                     $updates = [];
                 }
             }
 
             if(have_posts($updates)) {
-                $model->table('branchs')::updateBatch($updates, 'id');
+                \Branch::updateBatch($updates, 'id');
             }
-
-            (include BRANCH_PATH.'/database/db_1.2.1.php')->up();
         }
+    }
+
+    public function run(): void
+    {
+        $this->location();
+        $this->database();
     }
 }

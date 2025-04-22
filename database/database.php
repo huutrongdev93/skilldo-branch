@@ -10,17 +10,17 @@ return new class () extends Migration {
         if(!schema()->hasTable('branchs')) {
             schema()->create('branchs', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('name', 255)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('phone', 200)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('email', 200)->collate('utf8mb4_unicode_ci')->nullable();
-                $table->string('address', 255)->collate('utf8mb4_unicode_ci')->nullable();
+                $table->string('name', 255)->collation('utf8mb4_unicode_ci')->nullable();
+                $table->string('phone', 200)->collation('utf8mb4_unicode_ci')->nullable();
+                $table->string('email', 200)->collation('utf8mb4_unicode_ci')->nullable();
+                $table->string('address', 255)->collation('utf8mb4_unicode_ci')->nullable();
                 $table->integer('ward')->default(0);
                 $table->integer('district')->default(0);
                 $table->integer('city')->default(0);
-                $table->string('status', 100)->collate('utf8mb4_unicode_ci')->default('working');
-                $table->integer('default')->default(0);
+                $table->string('status', 100)->collation('utf8mb4_unicode_ci')->default('working');
+                $table->integer('isDefault')->default(0);
                 $table->integer('order')->default(0);
-                $table->text('area')->collate('utf8mb4_unicode_ci')->nullable();
+                $table->text('area')->collation('utf8mb4_unicode_ci')->nullable();
                 $table->dateTime('created')->default(DB::raw('CURRENT_TIMESTAMP'));
                 $table->dateTime('updated')->nullable();
             });

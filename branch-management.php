@@ -1,7 +1,7 @@
 <?php
 const BRANCH_NAME = 'branch-management';
 
-const BRANCH_VERSION = '1.2.1';
+const BRANCH_VERSION = '2.0.0';
 
 define('BRANCH_PATH', Path::plugin(BRANCH_NAME));
 
@@ -19,6 +19,7 @@ class Branch_Management {
         Branch_Deactivation::uninstall();
     }
 }
+include_once 'includes/Status.php';
 
 require_once 'includes/branch-active.php';
 
@@ -26,15 +27,11 @@ require_once 'includes/branch-model.php';
 
 if(Admin::is()) {
 
-    include_once 'update.php';
+    include_once 'update/update.php';
 
     include_once 'includes/branch-roles.php';
 
     include_once 'includes/branch-ajax.php';
 
-    include_once 'includes/branch-order.php';
-
-    include_once 'admin/branch-admin.php';
-
-    new BrandOrderAction();
+    include_once 'admin/admin.php';
 }
