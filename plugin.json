@@ -1,0 +1,21 @@
+{
+    "name": "Kho hàng chi nhánh",
+    "class": "BranchManagement",
+    "url": "https://sikido.vn",
+    "description": "Ứng dụng quản lý chi nhánh",
+    "author": "SKDSoftware Dev Team",
+    "version": "3.0.0",
+    "providers": [
+    ],
+    "aliases": {
+        "controller" : {
+            "BranchManagement\\Controllers\\Admin\\BranchController" : "branch"
+        }
+    },
+    "autoload": {
+        "alias": "BranchManagement",
+        "psr-4": {
+            "BranchManagement\\Enums" : "app\\Enums"
+        }
+    }
+}
