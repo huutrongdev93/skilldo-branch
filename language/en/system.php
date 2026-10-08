@@ -7,4 +7,5 @@ return [
     'field.city' => 'City',
     'field.district' => 'District',
     'field.ward' => 'Ward',
+    'field.status' => 'Status',
 ];

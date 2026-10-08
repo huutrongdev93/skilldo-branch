@@ -1,7 +1,7 @@
 <?php
 return [
     'add' => 'Thêm chi nhánh',
-    'default' => 'Đặng làm mặc định',
+    'default' => 'Đặt làm mặc định',
     'stop' => 'Ngưng sử dụng',
     'stop.confirm' => 'Bạn chắc chắn muốn ngưng sử dụng chi nhánh này',
     'start' => 'Sử dụng',

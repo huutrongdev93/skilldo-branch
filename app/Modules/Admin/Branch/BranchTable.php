@@ -44,7 +44,7 @@ class BranchTable extends SKDObjectTable
                 }),
             ],
             'status'   => [
-                'label' => trans('user.status'),
+                'label' => trans('branch-management::system.field.status'),
                 'column' => fn($item, $args) => ColumnBadge::make('status', $item, $args)
                     ->color(fn (string $state): string => BranchStatus::tryFrom($state)->badge())
                     ->label(fn (string $state): string => BranchStatus::tryFrom($state)->label())

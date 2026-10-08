@@ -7,4 +7,5 @@ return [
     'field.city' => 'Tỉnh Thành',
     'field.district' => 'Quận Huyện',
     'field.ward' => 'Phường xã',
+    'field.status' => 'Trạng thái',
 ];
