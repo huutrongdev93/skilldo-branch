@@ -38,8 +38,9 @@ Class ActivatorService
             });
         }
 
-        if(schema()->hasTable('user') && !schema()->hasColumn('user', 'branch_id')) {
-            schema()->table('user', function (Blueprint $table)
+        // Bảng lõi là `users` (trước đây ghi nhầm `user` nên cột không bao giờ được tạo)
+        if(schema()->hasTable('users') && !schema()->hasColumn('users', 'branch_id')) {
+            schema()->table('users', function (Blueprint $table)
             {
                 $table->integer('branch_id')->default(0)->after('status');
             });

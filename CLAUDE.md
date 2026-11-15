@@ -2,7 +2,7 @@
 
 ## Plugin này là gì
 
-**Kho hàng chi nhánh** (v3.0.1) — quản lý danh sách chi nhánh/kho (tên, SĐT, email, địa chỉ, tỉnh/phường, trạng thái, chi nhánh mặc định). Bản thân plugin chỉ là danh mục chi nhánh; các plugin khác dùng bảng `branchs` làm khoá ngoại (stock-manager, giaohangnhanh, báo cáo của sicommerce).
+**Kho hàng chi nhánh** (v3.0.2) — quản lý danh sách chi nhánh/kho (tên, SĐT, email, địa chỉ, tỉnh/phường, trạng thái, chi nhánh mặc định). Bản thân plugin chỉ là danh mục chi nhánh; các plugin khác dùng bảng `branchs` làm khoá ngoại (stock-manager, giaohangnhanh, báo cáo của sicommerce).
 
 - Namespace `BranchManagement\*` (alias `BranchManagement` → `app/`, thêm PSR-4 `Enums`). Main class `BranchManagement` (`index.php`): `active()`/`uninstall()` `include_once` thẳng file Service rồi gọi.
 - Alias controller `branch` → `BranchController` (khai trong `plugin.json`).
@@ -16,8 +16,8 @@
 ## Dữ liệu
 
 - Bảng `branchs`: `name`, `phone`, `email`, `address`, `ward`, `district`, `city` (int), `status` (`working`|`stop`), `isDefault`, `order`, `area` (cast mảng), `created`, `updated`.
-- Thêm cột `order.branch_id`; Activator cũng định thêm `user.branch_id` nhưng kiểm bảng **`user`** trong khi bảng lõi là **`users`** → cột này thực tế không bao giờ được tạo (xem mục lỗi).
-- Uninstall: drop bảng `branchs`, drop cột `branch_id` ở `order` và `user`.
+- Thêm cột `order.branch_id`; Activator thêm `users.branch_id` (đã sửa tên bảng, xem mục Đã sửa).
+- Uninstall: drop bảng `branchs`, drop cột `branch_id` ở `order` và `users`.
 - Quyền: `branch_list`, `branch_add`, `branch_edit` (cấp cho root + administrator; nhãn đăng ký vào user-role-editor qua `user_role_editor_group/label`).
 - Cache: xoá `branch_*` mỗi khi `saved`.
 
@@ -38,9 +38,12 @@
 
 Filter `admin_branch_save_validation` (trả `SKD_Error` để chặn lưu), `columns_db_branch`, `pre_insert_branch_data`, `manage_branch_input`.
 
-## Điều đáng lưu ý (chưa sửa)
+## Đã sửa (15/11/2026)
 
-- `BranchAjax::status` validate bằng `\Branch\Status::cases()` — class không tồn tại (enum thật là `BranchManagement\Enums\BranchStatus`) → gọi action này sẽ fatal.
-- `BranchAjax::status` và `default` dùng `Branch::widthStop()` nên chi nhánh đã `stop` không tìm thấy ("không tồn tại"), tức không bật lại được; hai action này cũng không kiểm quyền `branch_edit`.
-- `BranchAjax::save` chỉ cập nhật `name/address/phone` (email, tỉnh, phường không lưu) và nếu `isDefault=1` thì chỉ đặt các chi nhánh khác về 0 mà không đặt chi nhánh này lên 1. Hook `admin_branch_save_validation` nhận mảng ở `add` nhưng nhận model ở `save`.
-- `Activator` kiểm bảng `user` (lõi là `users`).
+- v3.0.2. `BranchAjax::status` dùng đúng enum `BranchStatus` (trước đó gọi class không tồn tại nên fatal).
+- `status` / `default` tìm chi nhánh không qua `widthStop()` nữa nên bật lại được chi nhánh đã ngưng; chi nhánh ngưng không được đặt làm mặc định.
+- `default` và `save(isDefault=1)` đổi mặc định trong transaction, bỏ mặc định ở mọi chi nhánh khác (không lọc status) rồi đặt chi nhánh này lên 1 (luôn đúng 1 mặc định).
+- `save` lưu thêm email / city / ward (khi có gửi lên).
+- `status`, `default` kiểm quyền `branch_edit` (add/save đã có sẵn).
+- Activator / Deactivator dùng bảng `users` (trước là `user`); Deactivator dùng `dropIfExists`. Site đã kích hoạt từ trước phải tắt rồi bật lại plugin để có cột `users.branch_id` (plugin không có cơ chế nâng cấp theo phiên bản).
+- Còn lại: hook `admin_branch_save_validation` nhận mảng ở `add` nhưng nhận model ở `save`.

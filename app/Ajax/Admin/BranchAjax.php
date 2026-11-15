@@ -92,21 +92,58 @@ class BranchAjax
 
         $branch->phone = $request->input('branch.phone');
 
-        $branch->save();
-
-        if($request->has('branch.isDefault') && $request->input('branch.isDefault') == 1)
+        // Form gửi thêm email / tỉnh / phường: chỉ ghi khi có gửi để không xoá nhầm dữ liệu cũ
+        if($request->has('branch.email'))
         {
-            Branch::where('id', '<>', $id)->update(['isDefault' => 0]);
+            $branch->email = Str::clear($request->input('branch.email'));
         }
+
+        if($request->has('branch.city'))
+        {
+            $branch->city = (int)$request->input('branch.city');
+        }
+
+        if($request->has('branch.ward'))
+        {
+            $branch->ward = (int)$request->input('branch.ward');
+        }
+
+        $makeDefault = $request->has('branch.isDefault') && $request->input('branch.isDefault') == 1;
+
+        // Chi nhánh ngừng hoạt động không được làm mặc định (luôn phải có đúng 1 mặc định đang chạy)
+        if($makeDefault && $branch->status != BranchStatus::WORKING->value)
+        {
+            response()->error('Không thể đặt chi nhánh đã ngưng sử dụng làm mặc định');
+        }
+
+        if($makeDefault)
+        {
+            $branch->isDefault = 1;
+        }
+
+        // Gộp đổi mặc định + lưu vào một transaction để không bị 0 hoặc 2 chi nhánh mặc định
+        \Illuminate\Support\Facades\DB::transaction(function () use ($branch, $id, $makeDefault) {
+            if($makeDefault)
+            {
+                Branch::where('id', '<>', $id)->update(['isDefault' => 0]);
+            }
+
+            $branch->save();
+        });
 
         response()->success(trans('ajax.save.success'));
     }
 
     static function status(Request $request): void
     {
+        if(!Auth::hasCap('branch_edit'))
+        {
+            response()->error(trans('branch-management::ajax.error.permission'));
+        }
+
         $validate = $request->validate([
             'id' => Rule::make('Id chi nhánh')->notEmpty()->integer()->min(1),
-            'status' => Rule::make('Trạng thái')->notEmpty()->in(array_column(\Branch\Status::cases(), 'value')),
+            'status' => Rule::make('Trạng thái')->notEmpty()->in(array_column(BranchStatus::cases(), 'value')),
         ]);
 
         if ($validate->fails())
@@ -116,7 +153,8 @@ class BranchAjax
 
         $id = (int)$request->input('id');
 
-        $object = Branch::WidthStop()->whereKey($id)->first();
+        // Không dùng widthStop(): scope đó chỉ trả chi nhánh đang chạy nên chi nhánh đã ngưng sẽ không bật lại được
+        $object = Branch::whereKey($id)->first();
 
         if(!hasItems($object))
         {
@@ -152,6 +190,11 @@ class BranchAjax
 
     static function default(\SkillDo\Http\Request $request): void
     {
+        if(!Auth::hasCap('branch_edit'))
+        {
+            response()->error(trans('branch-management::ajax.error.permission'));
+        }
+
         $validate = $request->validate([
             'id' => Rule::make('Id chi nhánh')->notEmpty()->integer()->min(1),
         ]);
@@ -162,7 +205,7 @@ class BranchAjax
 
         $id = (int)$request->input('id');
 
-        $object = Branch::widthStop()->whereKey($id)->first();
+        $object = Branch::whereKey($id)->first();
 
         if(!hasItems($object))
         {
@@ -174,11 +217,20 @@ class BranchAjax
             response()->error('Chi nhánh này đang là chi nhánh mặc định');
         }
 
-        Branch::widthStop()->where('isDefault', 1)->update(['isDefault' => 0]);
+        // Chi nhánh ngưng sử dụng không được làm mặc định
+        if($object->status != BranchStatus::WORKING->value)
+        {
+            response()->error('Không thể đặt chi nhánh đã ngưng sử dụng làm mặc định');
+        }
 
-        $object->isDefault = 1;
+        // Bỏ mặc định ở MỌI chi nhánh (không lọc theo status) rồi đặt chi nhánh này, trong một transaction
+        \Illuminate\Support\Facades\DB::transaction(function () use ($object, $id) {
+            Branch::where('id', '<>', $id)->update(['isDefault' => 0]);
 
-        $object->save();
+            $object->isDefault = 1;
+
+            $object->save();
+        });
 
         response()->success(trans('ajax.update.success'));
     }

@@ -9,7 +9,7 @@ Class DeactivatorService
     {
         if(schema()->hasTable('branchs'))
         {
-            schema()->drop('branchs');
+            schema()->dropIfExists('branchs');
         }
 
         if(schema()->hasColumn('order', 'branch_id'))
@@ -20,9 +20,9 @@ Class DeactivatorService
             });
         }
 
-        if(schema()->hasColumn('user', 'branch_id'))
+        if(schema()->hasTable('users') && schema()->hasColumn('users', 'branch_id'))
         {
-            schema()->table('user', function (Blueprint $table)
+            schema()->table('users', function (Blueprint $table)
             {
                 $table->dropColumn('branch_id');
             });
